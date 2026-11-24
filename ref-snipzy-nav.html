@@ -1,0 +1,408 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Liquid Glass Navigation Bar - A stunning glass navbar with Apple liquid distortion effects. Copy this high-quality CSS snippet for your projects.">
+  <title>Liquid Glass Navigation | Snipzy</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/images/favicon.ico" type="image/x-icon">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts - Modern Stack -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Prism CSS for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="css/liquid-glass-nav.css">
+  
+  <!-- Favicon and PWA -->
+  <meta name="author" content="triple6dev">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0d0d0d">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="shortcut icon" href="/assets/images/favicon.ico">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Liquid Glass Navigation | Snipzy">
+  <meta property="og:description" content="A stunning glass navigation bar with Apple liquid distortion animations. Perfect for modern, eye-catching UI elements.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://snipzy.dev">
+  <meta property="og:image" content="https://snipzy.dev/assets/images/snipzyog.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Snipzy | Modern Code Snippets">
+  <meta name="twitter:description" content="Clean, modern frontend code snippets for developers.">
+  <meta name="twitter:image" content="https://snipzy.dev/assets/images/snipzyog.png">
+
+  <!-- Structured Data (Schema.org JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "Snipzy",
+      "url": "https://snipzy.dev",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://snipzy.dev/assets/images/snipzylogo.png"
+      },
+      "sameAs": [
+        "https://twitter.com/triple6dev",
+        "https://reddit.com/u/triple6dev"
+      ],
+      "founder": {
+        "@type": "Person",
+        "name": "triple6dev",
+        "url": "https://snipzy.dev"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "name": "Snipzy",
+      "url": "https://snipzy.dev",
+      "description": "A modern platform for high-quality HTML, CSS, and JavaScript code snippets.",
+      "inLanguage": "en-US",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Snipzy",
+        "url": "https://snipzy.dev"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "name": "Snipzy - HTML, CSS, and JS Snippets",
+      "url": "https://snipzy.dev",
+      "description": "Explore and share front-end code snippets. Improve your workflow with high-quality, reusable components.",
+      "inLanguage": "en-US",
+      "isPartOf": {
+        "@type": "WebSite",
+        "url": "https://snipzy.dev"
+      },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://snipzy.dev/assets/images/snipzyog.png"
+      }
+    },
+    {
+      "@type": "Person",
+      "name": "triple6dev",
+      "url": "https://snipzy.dev",
+      "sameAs": [
+        "https://twitter.com/triple6dev",
+        "https://reddit.com/u/triple6dev"
+      ]
+    }
+  ]
+}
+</script>
+
+  <!--GoogleAD-->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2356402905127160"
+       crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-content">
+        <a href="/index.html" class="logo">
+          <img src="/assets/images/snipzylogo.png" alt="Snipzy Logo" class="logo-img">
+          Snipzy <span class="snippet-id">BETA</span>
+        </a>
+        
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/snippets/">Snippets</a></li>
+            <li><a href="/index.html#categories">Categories</a></li>
+            <li><a href="/submit.html">Submit</a></li>
+            <li><a href="/report.html">Report</a></li>
+          </ul>
+        </nav>
+        
+        <div class="header-actions">
+          <button class="theme-toggle" aria-label="Toggle dark mode">
+            <i class="fas fa-moon"></i>
+          </button>
+          
+          <button class="mobile-menu-toggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Snippet Header -->
+  <section class="snippet-header">
+    <div class="container">
+      <div class="snippet-header-content">
+        <div class="snippet-info">
+          <span class="snippet-id">NAV002</span>
+          <h1>Apple Liquid Glass Navigation</h1>
+          <p class="snippet-description">A stunning liquid glass navigation bar with liquid distortion effects and interactive hover states</p>
+          <div class="snippet-meta">
+            <span class="snippet-category"><i class="fas fa-bars"></i> JavaScript</span>
+          </div>
+          <!-- Browser Compatibility Warning -->
+<div class="tag browser-tag">
+  <span>
+    <strong>Chrome Only:</strong>
+    This snippet is fully supported only in <strong>Google Chrome</strong>. Other browsers will display a simplified version.<br>
+  </span>
+</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Snippet Preview -->
+  <section class="snippet-preview-section">
+    <div class="container">
+      <h2>Live Preview</h2>
+      <div class="live-preview">
+        <div class="preview-container">
+          <!-- SVG Filter for Glass Distortion -->
+          <svg style="display: none">
+            <filter id="glass-distortion">
+              <feTurbulence type="turbulence" baseFrequency="0.008" numOctaves="2" result="noise" />
+              <feDisplacementMap in="SourceGraphic" in2="noise" scale="77" />
+            </filter>
+          </svg>
+
+          <nav class="glass-nav">
+            <div class="glass-filter"></div>
+            <div class="glass-overlay"></div>
+            <div class="glass-specular"></div>
+            <div class="glass-content">
+              <ul class="nav-list">
+                <li><a href="#" class="nav-item active">Home</a></li>
+                <li><a href="#" class="nav-item">About</a></li>
+                <li><a href="#" class="nav-item">Services</a></li>
+                <li><a href="#" class="nav-item">Contact</a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Snippet Code -->
+  <section class="snippet-code-section">
+    <div class="container">
+      <h2>Code</h2>
+      
+      <!-- HTML Code -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-language">HTML</span>
+          <button class="copy-button" data-target="html-code">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+        <pre><code class="language-html" id="html-code">&lt;!-- SVG Filter for Glass Distortion --&gt;
+&lt;svg style="display: none"&gt;
+  &lt;filter id="glass-distortion"&gt;
+    &lt;feTurbulence type="turbulence" baseFrequency="0.008" numOctaves="2" result="noise" /&gt;
+    &lt;feDisplacementMap in="SourceGraphic" in2="noise" scale="77" /&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;
+
+&lt;nav class="glass-nav"&gt;
+  &lt;div class="glass-filter"&gt;&lt;/div&gt;
+  &lt;div class="glass-overlay"&gt;&lt;/div&gt;
+  &lt;div class="glass-specular"&gt;&lt;/div&gt;
+  &lt;div class="glass-content"&gt;
+    &lt;ul class="nav-list"&gt;
+      &lt;li&gt;&lt;a href="#" class="nav-item active"&gt;Home&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="#" class="nav-item"&gt;About&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="#" class="nav-item"&gt;Services&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href="#" class="nav-item"&gt;Contact&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/nav&gt;
+</code></pre>
+      </div>
+
+      <!-- CSS Code -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-language">CSS</span>
+          <button class="copy-button" data-target="css-code">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+        <pre><code class="language-css" id="css-code">/* Glass Navigation Container */
+.glass-nav {
+  --bg-color: rgba(255, 255, 255, 0.25);
+  --highlight: rgba(255, 255, 255, 0.75);
+  --text: #ffffff;
+  
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.glass-filter,
+.glass-overlay,
+.glass-specular {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.glass-filter {
+  z-index: 1;
+  backdrop-filter: blur(4px);
+  filter: url(#glass-distortion) saturate(120%) brightness(1.15);
+}
+
+.glass-overlay {
+  z-index: 2;
+  background: var(--bg-color);
+}
+
+.glass-specular {
+  z-index: 3;
+  box-shadow: inset 1px 1px 1px var(--highlight);
+}
+
+.glass-content {
+  position: relative;
+  z-index: 4;
+  padding: 16px;
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.nav-item {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .glass-nav {
+    --bg-color: rgba(0, 0, 0, 0.25);
+    --highlight: rgba(255, 255, 255, 0.15);
+  }
+}</code></pre>
+      </div>
+
+      <!-- JavaScript Code -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-language">JavaScript</span>
+          <button class="copy-button" data-target="js-code">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+        <pre><code class="language-javascript" id="js-code">document.addEventListener('DOMContentLoaded', function() {
+
+ // Add nav item click handler
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      navItems.forEach(navItem => navItem.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+});
+</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Snipzy.dev</h3>
+          <p>A modern platform for high-quality HTML, CSS, and JavaScript code snippets.</p>
+          <div class="social-links">
+            <a href="https://x.com/triple6dev" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.reddit.com/u/triple6dev/" aria-label="Reddit"><i class="fab fa-reddit-alien"></i></a>
+            <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+            <a href="/cdn-cgi/l/email-protection#23404c4d5742405763504d4a53595a0d474655" aria-label="Email"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Links</h3>
+          <ul class="footer-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/snippets/">Snippets</a></li>
+            <li><a href="/generator/">Generator</a></li>
+            <li><a href="/index.html#categories">Categories</a></li>
+            <li><a href="/submit.html">Submit</a></li>
+            <li><a href="/report.html">Report</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Resources</h3>
+          <ul class="footer-links">
+            <li><a href="/index.html#developers">Featured Developers</a></li>
+            <li><a href="/privacy.html">Privacy Policy</a></li>
+            <li><a href="/terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="copyright">
+        <p>Copyright © 2026 triple6dev. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Prism.js for syntax highlighting -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  
+  <!-- Custom JavaScript -->
+  <script src="../assets/js/main.js"></script>
+  <script src="js/liquid-glass-nav.js"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"9eeff2e3df874a4c94e07f00ced8830e","r":1}' crossorigin="anonymous"></script>
+</body>
+</html>
+

@@ -1,0 +1,73 @@
+uniform shader content;
+uniform float2 size;
+uniform float2 offset;
+uniform float4 cornerRadii; // top-left, top-right, bottom-right, bottom-left
+uniform float refractionHeight;
+uniform float refractionAmount;
+uniform float depthEffect;
+uniform float chromaticAberration;
+
+float radiusAt(float2 p, float4 r) {
+    if (p.x >= 0.0) return p.y <= 0.0 ? r.y : r.z;
+    return p.y <= 0.0 ? r.x : r.w;
+}
+
+float sdRoundedRect(float2 p, float2 halfSize, float radius) {
+    float2 q = abs(p) - (halfSize - float2(radius));
+    float outside = length(max(q, 0.0)) - radius;
+    float inside = min(max(q.x, q.y), 0.0);
+    return outside + inside;
+}
+
+float2 gradSdRoundedRect(float2 p, float2 halfSize, float radius) {
+    float2 q = abs(p) - (halfSize - float2(radius));
+    if (q.x >= 0.0 || q.y >= 0.0) {
+        return sign(p) * normalize(max(q, 0.0));
+    }
+    float gx = step(q.y, q.x);
+    return sign(p) * float2(gx, 1.0 - gx);
+}
+
+float circleMap(float x) { return 1.0 - sqrt(1.0 - x * x); }
+
+half4 main(float2 coord) {
+    float2 halfSize = size * 0.5;
+    float2 centered = (coord + offset) - halfSize;
+    float radius = radiusAt(coord, cornerRadii);
+    float sd = sdRoundedRect(centered, halfSize, radius);
+
+    if (-sd >= refractionHeight) return content.eval(coord);
+    sd = min(sd, 0.0);
+    float d = circleMap(1.0 - (-sd / refractionHeight)) * refractionAmount;
+    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));
+    float2 grad = normalize(
+        gradSdRoundedRect(centered, halfSize, gradRadius) +
+        depthEffect * normalize(centered)
+    );
+    float2 refracted = coord + d * grad;
+
+    // Set chromaticAberration to 0 for ordinary refraction.
+    float dispersion = chromaticAberration *
+        ((centered.x * centered.y) / (halfSize.x * halfSize.y));
+    float2 dc = d * grad * dispersion;
+    if (chromaticAberration == 0.0) return content.eval(refracted);
+
+    half4 c = half4(0.0);
+    half4 red    = content.eval(refracted + dc);
+    half4 orange = content.eval(refracted + dc * (2.0 / 3.0));
+    half4 yellow = content.eval(refracted + dc * (1.0 / 3.0));
+    half4 green  = content.eval(refracted);
+    half4 cyan   = content.eval(refracted - dc * (1.0 / 3.0));
+    half4 blue   = content.eval(refracted - dc * (2.0 / 3.0));
+    half4 purple = content.eval(refracted - dc);
+
+    c.r += red.r / 3.5;    c.a += red.a / 7.0;
+    c.r += orange.r / 3.5; c.g += orange.g / 7.0; c.a += orange.a / 7.0;
+    c.r += yellow.r / 3.5; c.g += yellow.g / 3.5; c.a += yellow.a / 7.0;
+    c.g += green.g / 3.5;  c.a += green.a / 7.0;
+    c.g += cyan.g / 3.5;   c.b += cyan.b / 3.0; c.a += cyan.a / 7.0;
+    c.b += blue.b / 3.0;   c.a += blue.a / 7.0;
+    c.r += purple.r / 7.0; c.b += purple.b / 3.0; c.a += purple.a / 7.0;
+    return c;
+}
+

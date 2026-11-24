@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Liquid Glass Navigation</title>
+  <style>
+    :root { color-scheme:light; --accent:#183c31; --nav-width:min(640px,calc(100vw - 28px)); }
+    * { box-sizing:border-box; }
+    html,body { margin:0; min-height:100%; }
+    body { min-height:100vh; overflow:hidden; font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#dce3e8; color:#15211c; }
+    button { font:inherit; -webkit-tap-highlight-color:transparent; }
+
+    .backdrop { position:fixed; inset:0; overflow:hidden; isolation:isolate; background:#dfe6ea;
+      background-image:radial-gradient(circle at 9% 79%,rgba(31,144,209,.86) 0 4.5%,transparent 4.8% 16%),radial-gradient(circle at 44% 83%,rgba(247,213,65,.9) 0 5.2%,transparent 5.5% 19%),radial-gradient(circle at 88% 76%,rgba(224,66,133,.82) 0 5.8%,transparent 6.1% 18%),linear-gradient(135deg,rgba(255,255,255,.22),transparent 42%); }
+    .backdrop::before { content:""; position:absolute; inset:-18%; background:
+      linear-gradient(116deg,rgba(42,155,203,.72) 0 18%,transparent 34%),
+      linear-gradient(25deg,transparent 24%,rgba(255,183,83,.76) 41%,transparent 58%),
+      linear-gradient(152deg,transparent 40%,rgba(224,88,157,.74) 62%,transparent 81%),
+      linear-gradient(205deg,rgba(101,199,157,.72),transparent 48%),
+      linear-gradient(135deg,#dae5e7,#f2e1d4 49%,#d9e8e5); filter:saturate(1.12); transform:rotate(-4deg) scale(1.16); animation:backdropDrift 18s ease-in-out infinite alternate; }
+    .backdrop::after { content:""; position:absolute; inset:0; opacity:.18; background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px); background-size:46px 46px; mask-image:linear-gradient(to bottom,transparent,#000 16%,#000 86%,transparent); }
+    .color-shape { position:absolute; z-index:1; pointer-events:none; filter:blur(1px) saturate(1.18); box-shadow:0 18px 38px rgba(27,48,55,.2); }
+    .shape-a { width:150px; height:112px; left:12%; bottom:42px; border-radius:34px 52px 28px 48px; background:linear-gradient(135deg,#1a9fd2,#63d6ed); transform:rotate(-10deg); }
+    .shape-b { width:132px; height:132px; left:45%; bottom:34px; border-radius:50%; background:radial-gradient(circle at 34% 28%,#fff37b 0 5%,#f4c62d 28%,#e99048 74%); }
+    .shape-c { width:168px; height:108px; right:10%; bottom:46px; border-radius:48px 28px 54px 32px; background:linear-gradient(145deg,#df4f9f,#ff91a9); transform:rotate(8deg); }
+    @keyframes backdropDrift { to { transform:rotate(2deg) scale(1.22) translate(-2%,2%); } }
+
+    .nav-shell { position:fixed; left:50%; bottom:max(18px,env(safe-area-inset-bottom)); z-index:10; width:var(--nav-width); height:84px; padding:7px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); align-items:stretch; transform:translateX(-50%); border:0.65px solid rgba(255,255,255,.7); border-radius:44px; background:rgba(247,250,249,.57); box-shadow:0 22px 54px rgba(28,49,57,.2),0 5px 16px rgba(28,49,57,.1),inset 0 1px 0 rgba(255,255,255,.68),inset 0 -2px 0 rgba(74,96,102,.16); backdrop-filter:blur(22px) saturate(1.2) contrast(1.04); -webkit-backdrop-filter:blur(22px) saturate(1.2) contrast(1.04); touch-action:none; user-select:none; }
+    .nav-shell::before { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(105deg,rgba(255,255,255,.5),transparent 24%,transparent 70%,rgba(255,255,255,.32)); mix-blend-mode:screen; transition:filter .14s ease,opacity .14s ease; }
+    .nav-shell::after { content:""; position:absolute; left:9%; right:9%; top:-1px; height:13px; border-radius:50%; pointer-events:none; background:rgba(255,255,255,.42); filter:blur(8px); }
+    .nav-shell { transition:transform .14s ease,filter .14s ease,box-shadow .16s ease; }
+    .nav-shell.is-pressed { transform:translateX(-50%) translateY(1px) scale(.994); filter:brightness(.975) saturate(1.04); box-shadow:0 16px 42px rgba(28,49,57,.22),0 3px 12px rgba(28,49,57,.12),inset 0 2px 0 rgba(255,255,255,.52),inset 0 -3px 0 rgba(74,96,102,.2); }
+    .nav-shell.is-pressed::before { opacity:.76; filter:brightness(.9) saturate(1.14); }
+    .tab { position:relative; z-index:2; min-width:0; display:grid; place-items:center; align-content:center; gap:4px; padding:5px 2px; border:0; border-radius:32px; color:rgba(24,37,34,.78); background:transparent; cursor:pointer; transition:color .18s ease,transform .18s ease; isolation:isolate; }
+    .tab::before { content:""; position:absolute; z-index:0; inset:5px 4px; border-radius:inherit; background:rgba(77,96,89,.13); box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 3px 10px rgba(38,56,49,.06); backdrop-filter:blur(8px) saturate(1.08); -webkit-backdrop-filter:blur(8px) saturate(1.08); opacity:0; transition:opacity .16s ease; }
+    .tab-icon,.tab-label { position:relative; z-index:1; }
+    .tab:focus-visible { outline:2px solid var(--accent); outline-offset:-4px; }
+    .tab[aria-selected=true] { color:var(--accent); font-weight:600; }
+    .tab[aria-selected=true]::before { opacity:1; }
+    .nav-shell.is-pressed .tab[aria-selected=true]::before { opacity:0; }
+    .nav-shell.is-moving .tab[aria-selected=true]::before { opacity:0; }
+    .tab:active { transform:scale(.96); }
+    .tab-icon { width:25px; height:25px; display:grid; place-items:center; font-size:22px; line-height:1; font-weight:650; filter:drop-shadow(0 2px 3px rgba(20,44,35,.16)); }
+    .tab-label { font-size:13px; line-height:1; letter-spacing:.01em; }
+
+    .liquid-pill { position:absolute; z-index:3; left:0; top:50%; width:140px; height:70px; pointer-events:none; opacity:0; visibility:hidden; transform:translate3d(0,-50%,0); transform-origin:center; will-change:transform,opacity; transition:opacity .1s ease; }
+    .liquid-pill.is-visible { opacity:1; visibility:visible; }
+    .pill-surface { position:absolute; inset:0; overflow:visible; border:0.24px solid rgba(255,255,255,.34); border-radius:999px; background:rgba(255,255,255,.13); box-shadow:0 12px 28px rgba(25,45,52,.16),inset .45px 0 rgba(77,211,236,.14),inset -.45px 0 rgba(255,115,181,.11),inset 0 .65px 0 rgba(255,255,255,.38),inset 0 -1.6px 0 rgba(41,78,77,.14),0 0 25px rgba(255,255,255,.14); backdrop-filter:url(#liquid-filter) blur(.55px) brightness(1.18) saturate(1.22) contrast(1.05); -webkit-backdrop-filter:url(#liquid-filter) blur(.55px) brightness(1.18) saturate(1.22) contrast(1.05); }
+    .pill-surface::before { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(68% 70% at var(--light-x,28%) var(--light-y,10%),rgba(255,255,255,.3),transparent 58%),linear-gradient(112deg,rgba(255,255,255,.2),rgba(255,255,255,.04) 37%,rgba(255,255,255,.09) 72%,rgba(255,255,255,.24)); mix-blend-mode:screen; }
+    .pill-surface::after { content:""; position:absolute; left:9%; top:3%; width:46%; height:27%; border-radius:50%; pointer-events:none; background:rgba(255,255,255,.12); filter:blur(8px); transform:rotate(-8deg); }
+    .pill-rim { position:absolute; inset:0; border:0; border-radius:inherit; pointer-events:none; box-shadow:inset 0 -7px 11px rgba(31,72,82,.05); }
+    .nav-shell.is-pressed .pill-surface { box-shadow:0 18px 39px rgba(25,45,52,.2),inset 0 1.2px 0 rgba(255,255,255,.62),inset 0 -5px 13px rgba(41,78,77,.12),0 0 40px rgba(255,255,255,.2); background:rgba(255,255,255,.1); backdrop-filter:url(#liquid-filter) blur(.25px) brightness(1.24) saturate(1.18) contrast(1.05); -webkit-backdrop-filter:url(#liquid-filter) blur(.25px) brightness(1.24) saturate(1.18) contrast(1.05); }
+    .nav-shell.is-dragging .pill-surface, .nav-shell.is-dragging .pill-rim { transition:none; }
+    .nav-shell.is-dragging { cursor:grabbing; }
+    svg.liquid-defs { position:fixed; width:0; height:0; pointer-events:none; }
+    #mapCanvas { position:fixed; left:-200px; top:-200px; width:1px; height:1px; opacity:0; pointer-events:none; }
+    @media (max-width:430px) { .nav-shell { height:78px; border-radius:40px; } .liquid-pill { height:64px; } .tab-label { font-size:12px; } .tab-icon { font-size:20px; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.001ms!important; transition-duration:.001ms!important; } }
+    @media (prefers-reduced-transparency:reduce) { .nav-shell,.pill-surface { background:rgba(247,250,250,.94); backdrop-filter:none; -webkit-backdrop-filter:none; } }
+  </style>
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"><div class="color-shape shape-a"></div><div class="color-shape shape-b"></div><div class="color-shape shape-c"></div></div>
+  <svg class="liquid-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="liquid-filter" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" x="-30" y="-30" width="260" height="130">
+        <feImage id="displacementMap" result="map" x="0" y="0" width="220" height="90" preserveAspectRatio="none"></feImage>
+        <feDisplacementMap id="displacement" in="SourceGraphic" in2="map" xChannelSelector="R" yChannelSelector="G" scale="16"></feDisplacementMap>
+      </filter>
+    </defs>
+  </svg>
+  <canvas id="mapCanvas" aria-hidden="true"></canvas>
+  <nav id="nav" class="nav-shell" aria-label="Liquid glass navigation" role="tablist">
+    <div id="pill" class="liquid-pill" aria-hidden="true"><div class="pill-surface"><div class="pill-rim"></div></div></div>
+    <button class="tab" type="button" role="tab" data-index="0" aria-selected="true"><span class="tab-icon">⌂</span><span class="tab-label">首页</span></button>
+    <button class="tab" type="button" role="tab" data-index="1" aria-selected="false"><span class="tab-icon">◈</span><span class="tab-label">探索</span></button>
+    <button class="tab" type="button" role="tab" data-index="2" aria-selected="false"><span class="tab-icon">✦</span><span class="tab-label">收藏</span></button>
+    <button class="tab" type="button" role="tab" data-index="3" aria-selected="false"><span class="tab-icon">●</span><span class="tab-label">我的</span></button>
+  </nav>
+  <script>
+    (() => {
+      const nav = document.querySelector('#nav');
+      const pill = document.querySelector('#pill');
+      const surface = document.querySelector('.pill-surface');
+      const mapCanvas = document.querySelector('#mapCanvas');
+      const mapContext = mapCanvas.getContext('2d');
+      const displacementMap = document.querySelector('#displacementMap');
+      const displacement = document.querySelector('#displacement');
+      const tabs = [...nav.querySelectorAll('.tab')];
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+      const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+      const smoothStep = (a, b, t) => { t = clamp((t - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+      const roundedRectSDF = (x, y, width, height, radius) => {
+        const qx = Math.abs(x) - width + radius;
+        const qy = Math.abs(y) - height + radius;
+        return Math.min(Math.max(qx, qy), 0) + Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) - radius;
+      };
+      const project = (velocity, deceleration = .998) => velocity / 1000 * deceleration / (1 - deceleration);
+      const state = { active:0, currentX:0, targetX:0, velocity:0, pressed:0, lightX:.28, lightY:.1, dragging:false, pointerId:null, dragOffset:0, pressedIndex:null, lastX:0, lastTime:0, startX:0, moved:false, skipClick:false, travelDistance:0, transitioning:false };
+      const layout = { left:0, top:0, width:0, height:0, slot:0, pillWidth:0, pillHeight:0, centers:[] };
+      let motionFrame = 0;
+      let mapFrame = 0;
+      let lastMapKey = '';
+
+      function scheduleMap(force = false) {
+        if (mapFrame || document.visibilityState === 'hidden') return;
+        const mapKey = `${mapCanvas.width}:${mapCanvas.height}:${state.pressed > .5 ? 1 : 0}:${Math.round(clamp(Math.abs(state.velocity) / 1100, 0, 1) * 3)}:${Math.sign(state.velocity)}`;
+        if (!force && mapKey === lastMapKey) return;
+        lastMapKey = mapKey;
+        mapFrame = requestAnimationFrame(() => { mapFrame = 0; updateDisplacementMap(); });
+      }
+
+      function updateDisplacementMap() {
+        if (!mapCanvas.width || !layout.pillWidth) return;
+        const w = mapCanvas.width;
+        const h = mapCanvas.height;
+        const image = mapContext.createImageData(w, h);
+        const data = image.data;
+        const edgeRadius = .2;
+        const speed = clamp(Math.abs(state.velocity) / 1100, 0, 1);
+        const press = state.pressed;
+        const refractionScale = 15 + press * 8 + speed * 7;
+        const directional = clamp(state.velocity / 1100, -1, 1);
+        for (let py = 0; py < h; py++) {
+          const y = py / Math.max(h - 1, 1) - .5;
+          for (let px = 0; px < w; px++) {
+            const x = px / Math.max(w - 1, 1) - .5;
+            const sd = roundedRectSDF(x, y, .47, .40, edgeRadius);
+            const edge = 1 - smoothStep(.005, .16, Math.abs(sd));
+            const inner = smoothStep(-.42, 0, sd);
+            const push = edge * (.026 + press * .045 + speed * .035);
+            const bulgeX = -x * push * (1.08 + press * .2);
+            const bulgeY = -y * push * .75;
+            const dragX = directional * edge * (.032 + press * .012);
+            const dragY = -Math.abs(directional) * edge * .006;
+            const dx = (bulgeX + dragX) * w;
+            const dy = (bulgeY + dragY) * h;
+            const index = (py * w + px) * 4;
+            data[index] = Math.round(clamp(.5 + dx / refractionScale, 0, 1) * 255);
+            data[index + 1] = Math.round(clamp(.5 + dy / refractionScale, 0, 1) * 255);
+            data[index + 2] = Math.round((.5 + inner * .05) * 255);
+            data[index + 3] = 255;
+          }
+        }
+        mapContext.putImageData(image, 0, 0);
+        const url = mapCanvas.toDataURL('image/png');
+        displacementMap.setAttribute('href', url);
+        displacementMap.setAttributeNS('http://www.w3.org/1999/xlink', 'href', url);
+        displacement.setAttribute('scale', String(refractionScale));
+      }
+
+      function resizeMap() {
+        const dpr = Math.min(devicePixelRatio || 1, 1.25) * .8;
+        mapCanvas.width = Math.max(1, Math.round((layout.pillWidth + 34) * dpr));
+        mapCanvas.height = Math.max(1, Math.round((layout.pillHeight + 34) * dpr));
+        mapCanvas.style.width = (layout.pillWidth + 34) + 'px';
+        mapCanvas.style.height = (layout.pillHeight + 34) + 'px';
+        displacementMap.setAttribute('width', String(mapCanvas.width));
+        displacementMap.setAttribute('height', String(mapCanvas.height));
+        const filter = document.querySelector('#liquid-filter');
+        filter.setAttribute('width', String(mapCanvas.width + 60));
+        filter.setAttribute('height', String(mapCanvas.height + 60));
+        lastMapKey = '';
+        scheduleMap(true);
+      }
+
+      function measure(reset = true) {
+        const navRect = nav.getBoundingClientRect();
+        layout.left = navRect.left; layout.top = navRect.top; layout.width = navRect.width; layout.height = navRect.height;
+        layout.centers = tabs.map(tab => { const r = tab.getBoundingClientRect(); return r.left - navRect.left + r.width / 2; });
+        layout.slot = tabs[0].getBoundingClientRect().width;
+        layout.pillWidth = Math.max(54, layout.slot - 10);
+        layout.pillHeight = Math.max(54, navRect.height - 14);
+        pill.style.width = layout.pillWidth + 'px';
+        pill.style.height = layout.pillHeight + 'px';
+        if (reset && !state.dragging && !motionFrame) { state.currentX = layout.centers[state.active]; state.targetX = state.currentX; }
+        resizeMap();
+        render();
+      }
+
+      function render() {
+        const speed = clamp(Math.abs(state.velocity) / 950, 0, 1);
+        const press = state.pressed;
+        const progress = state.travelDistance > 1 ? clamp(1 - Math.abs(state.targetX - state.currentX) / state.travelDistance, 0, 1) : 0;
+        const transit = state.transitioning ? Math.sin(progress * Math.PI) : 0;
+        const stretch = clamp(transit * .82 + speed * .22, 0, 1.04);
+        const scaleX = 1 + press * .035 + stretch * .42;
+        const scaleY = 1 + press * .03 + transit * .05 + speed * .02;
+        const skew = clamp(state.velocity * .003, -2.5, 2.5);
+        const pillVisible = state.dragging || state.transitioning;
+        const direction = Math.sign(state.velocity || state.targetX - state.currentX) || 1;
+        const deform = clamp(transit * .72 + speed * .3, 0, 1);
+        pill.classList.toggle('is-visible', pillVisible);
+        pill.style.transform = `translate3d(${(state.currentX - layout.pillWidth / 2).toFixed(2)}px,-50%,0) scale(${scaleX.toFixed(4)},${scaleY.toFixed(4)}) skewX(${skew.toFixed(3)}deg)`;
+        const lead = direction > 0 ? deform : -deform;
+        const radiiX = [29 + lead * 7, 35 - lead * 3, 31 - lead * 5, 26 + lead * 4];
+        const radiiY = [25 - lead * 2, 29 + lead * 4, 27 + lead * 3, 24 - lead * 3];
+        surface.style.borderRadius = `${radiiX.map(value => value.toFixed(1) + 'px').join(' ')} / ${radiiY.map(value => value.toFixed(1) + 'px').join(' ')}`;
+        surface.style.setProperty('--light-x', (state.lightX * 100).toFixed(1) + '%');
+        surface.style.setProperty('--light-y', (state.lightY * 100).toFixed(1) + '%');
+        if (pillVisible) scheduleMap();
+      }
+
+      function stopMotion() {
+        if (motionFrame) cancelAnimationFrame(motionFrame);
+        motionFrame = 0;
+      }
+
+      function setActive(index) {
+        state.active = clamp(Math.round(index), 0, tabs.length - 1);
+        tabs.forEach((tab, i) => tab.setAttribute('aria-selected', String(i === state.active)));
+      }
+
+      function nearestIndex(x) {
+        let index = 0;
+        for (let i = 1; i < layout.centers.length; i++) {
+          if (Math.abs(layout.centers[i] - x) < Math.abs(layout.centers[index] - x)) index = i;
+        }
+        return index;
+      }
+
+      function animateTo(index, initialVelocity = 0) {
+        stopMotion();
+        const destination = clamp(Math.round(index), 0, tabs.length - 1);
+        state.travelDistance = Math.abs(layout.centers[destination] - state.currentX);
+        state.transitioning = state.travelDistance > 2;
+        state.targetX = layout.centers[destination];
+        state.velocity = initialVelocity;
+        if (reduceMotion.matches) {
+          setActive(destination); state.currentX = state.targetX; state.velocity = 0; state.pressed = 0; state.transitioning = false; state.travelDistance = 0; nav.classList.remove('is-pressed','is-dragging','is-moving'); render(); return;
+        }
+        nav.classList.add('is-dragging');
+        if (state.transitioning) nav.classList.add('is-moving');
+        render();
+        if (!state.transitioning && Math.abs(state.velocity) < 2) {
+          setActive(destination);
+          nav.classList.remove('is-moving');
+          if (!state.dragging) nav.classList.remove('is-dragging');
+          return;
+        }
+        const momentumRelease = Math.abs(initialVelocity) > 40;
+        let previous = performance.now();
+        const step = now => {
+          const dt = Math.min(.034, Math.max(.008, (now - previous) / 1000));
+          previous = now;
+          const stiffness = momentumRelease ? 430 : 560;
+          const damping = momentumRelease ? 31 : 39;
+          state.velocity += (state.targetX - state.currentX) * stiffness * dt;
+          state.velocity *= Math.exp(-damping * dt);
+          state.currentX += state.velocity * dt;
+          setActive(nearestIndex(state.currentX));
+          render();
+          if (Math.abs(state.targetX - state.currentX) < .8 && Math.abs(state.velocity) < 14) {
+            setActive(destination); state.currentX = state.targetX; state.velocity = 0; state.transitioning = false; state.travelDistance = 0; nav.classList.remove('is-moving'); if (!state.dragging) nav.classList.remove('is-dragging'); render(); motionFrame = 0; return;
+          }
+          motionFrame = requestAnimationFrame(step);
+        };
+        motionFrame = requestAnimationFrame(step);
+      }
+
+      function rubberband(value, dimension) { return value * dimension * .55 / (dimension + .55 * Math.abs(value)); }
+
+      function begin(event) {
+        const tab = event.target.closest('.tab');
+        const pillRect = pill.getBoundingClientRect();
+        const pillHit = event.clientX >= pillRect.left - 12 && event.clientX <= pillRect.right + 12 && event.clientY >= pillRect.top - 12 && event.clientY <= pillRect.bottom + 12;
+        if (!tab && !pillHit) return;
+        event.preventDefault();
+        stopMotion();
+        measure(false);
+        state.transitioning = false;
+        state.travelDistance = 0;
+        const localX = event.clientX - layout.left;
+        state.pressedIndex = tab ? Number(tab.dataset.index) : null;
+        const pressTargetX = state.pressedIndex == null ? state.currentX : layout.centers[state.pressedIndex];
+        state.dragOffset = localX - pressTargetX;
+        state.dragging = true; state.pointerId = event.pointerId; state.lastX = event.clientX; state.lastTime = performance.now(); state.startX = event.clientX; state.velocity = 0; state.moved = false; state.pressed = 1;
+        state.skipClick = true;
+        nav.classList.add('is-pressed','is-dragging');
+        nav.setPointerCapture?.(event.pointerId);
+        animateTo(state.pressedIndex == null ? state.active : state.pressedIndex, 0);
+      }
+
+      function move(event) {
+        if (!state.dragging || event.pointerId !== state.pointerId) return;
+        event.preventDefault();
+        const now = performance.now();
+        const dt = Math.max(8, now - state.lastTime);
+        state.velocity = (event.clientX - state.lastX) / dt * 1000;
+        state.lastX = event.clientX; state.lastTime = now;
+        if (!state.moved) {
+          if (Math.abs(event.clientX - state.startX) <= 3) return;
+          state.moved = true;
+          stopMotion();
+          state.transitioning = false;
+          state.travelDistance = 0;
+          nav.classList.add('is-moving','is-dragging');
+        }
+        const raw = event.clientX - layout.left - state.dragOffset;
+        const min = layout.centers[0]; const max = layout.centers[layout.centers.length - 1];
+        state.currentX = raw < min ? min + rubberband(raw - min, layout.width) : raw > max ? max + rubberband(raw - max, layout.width) : raw;
+        const crossed = nearestIndex(state.currentX);
+        if (crossed !== state.active) setActive(crossed);
+        render();
+      }
+
+      function end(event) {
+        if (!state.dragging || (event && event.pointerId !== state.pointerId)) return;
+        state.dragging = false;
+        try { nav.releasePointerCapture?.(state.pointerId); } catch (_) {}
+        const releaseVelocity = state.velocity;
+        const destination = state.moved ? state.active : (state.pressedIndex == null ? state.active : state.pressedIndex);
+        state.pressedIndex = null; state.pointerId = null; state.pressed = 0;
+        nav.classList.remove('is-pressed');
+        animateTo(destination, releaseVelocity);
+        setTimeout(() => { state.skipClick = false; }, 0);
+      }
+
+      nav.addEventListener('pointerdown', begin);
+      nav.addEventListener('pointermove', move);
+      nav.addEventListener('pointerup', end);
+      nav.addEventListener('pointercancel', end);
+      nav.addEventListener('lostpointercapture', event => { if (state.dragging) end(event); });
+      nav.addEventListener('click', event => { const tab = event.target.closest('.tab'); if (!tab) return; if (state.skipClick || state.moved) { event.preventDefault(); return; } animateTo(Number(tab.dataset.index), 0); });
+      nav.addEventListener('keydown', event => {
+        if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key) || !event.target.matches('.tab')) return;
+        event.preventDefault();
+        const current = Number(event.target.dataset.index);
+        const next = event.key === 'ArrowLeft' ? current - 1 : event.key === 'ArrowRight' ? current + 1 : event.key === 'Home' ? 0 : tabs.length - 1;
+        const index = clamp(next, 0, tabs.length - 1);
+        tabs[index].focus(); animateTo(index, 0);
+      });
+      addEventListener('pointermove', event => {
+        const pillRect = pill.getBoundingClientRect();
+        state.lightX = clamp((event.clientX - pillRect.left) / Math.max(pillRect.width, 1), 0, 1);
+        state.lightY = clamp((event.clientY - pillRect.top) / Math.max(pillRect.height, 1), 0, 1);
+        render();
+      }, { passive:true });
+      addEventListener('resize', () => { stopMotion(); measure(); });
+      addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { measure(false); render(); } });
+      setActive(0);
+      measure();
+    })();
+  </script>
+</body>
+</html>

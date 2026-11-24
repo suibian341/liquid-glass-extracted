@@ -1,0 +1,25 @@
+uniform float2 size;
+uniform float4 cornerRadii;
+layout(color) uniform half4 color;
+uniform float angle;
+uniform float falloff;
+
+float radiusAt(float2 p, float4 r) {
+    if (p.x >= 0.0) return p.y <= 0.0 ? r.y : r.z;
+    return p.y <= 0.0 ? r.x : r.w;
+}
+float2 gradSdRoundedRect(float2 p, float2 h, float radius) {
+    float2 q = abs(p) - (h - float2(radius));
+    if (q.x >= 0.0 || q.y >= 0.0) return sign(p) * normalize(max(q, 0.0));
+    float gx = step(q.y, q.x);
+    return sign(p) * float2(gx, 1.0 - gx);
+}
+half4 main(float2 coord) {
+    float2 h = size * 0.5;
+    float radius = radiusAt(coord, cornerRadii);
+    float2 grad = gradSdRoundedRect(coord - h, h,
+        min(radius * 1.5, min(h.x, h.y)));
+    float d = dot(grad, float2(cos(angle), sin(angle)));
+    return color * pow(abs(d), falloff);
+}
+
