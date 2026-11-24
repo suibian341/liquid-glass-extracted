@@ -57,4 +57,6 @@ APK 里提取的着色器笔记保留在 `refraction_dispersion.agsl` 和 `highl
 | `compose_example.kt` | Jetpack Compose 用法示例 |
 | `refraction_dispersion.agsl` | 折射 / 色散着色器笔记 |
 | `highlight.agsl` | 高光着色器笔记 |
-| `*.png` / `*.mp4` | 效果截图与录屏 |
+| `演示素材/` | 真机截图与录屏：抽屉拖动、滑块位移、列表滑动前后的对比，以及一段 12MB 的屏幕录制 |
+| `*.png` | 效果截图（含 coolapk 液态 tab 的各个状态） |
+
