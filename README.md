@@ -1,42 +1,60 @@
-# Liquid glass extraction notes
+# 液态玻璃（Liquid Glass）效果还原
 
-The APK `D:\suibian\Downloads\base(1).apk` contains:
+从 APK 里分析并还原的“液态玻璃”交互效果，包含 Android Compose 实现说明、AGSL 着色器笔记，以及一个可直接打开的 HTML 交互 Demo。
 
-- `io.github.kyant0:backdrop-android:2.0.0` and `io.github.kyant0:shapes-android:1.2.0`;
-- an app-specific Compose layer under `com.coolapk.market.widget.compose.liquid`;
-- a rounded-rectangle refraction shader with optional chromatic dispersion;
-- backdrop layer recording, blur, vibrancy, highlights and shadows.
+## 来源分析
 
-This folder contains a portable reconstruction of the effect. It is not a binary extraction of the APK's private classes. The shader logic matches the Apache-2.0 `AndroidLiquidGlass/Backdrop` implementation identified in the APK. Keep the Apache-2.0 notice when redistributing it:
+反编译的 APK 中包含：
+
+- `io.github.kyant0:backdrop-android:2.0.0` 与 `io.github.kyant0:shapes-android:1.2.0`
+- `com.coolapk.market.widget.compose.liquid` 下应用自研的 Compose 层
+- 圆角矩形折射着色器（可选色散）
+- 背景层录制、模糊、色彩增益（vibrancy）、高光与阴影
+
+本目录是**效果的可移植复刻**，不是对 APK 私有类的二进制提取。着色器逻辑与 Apache-2.0 的 `AndroidLiquidGlass/Backdrop` 实现一致，二次分发时请保留该许可证声明：
 
 <https://github.com/Kyant0/AndroidLiquidGlass>
 
-## What the effect is
+## 效果原理
 
-The visual stack is:
+视觉分层的顺序是：
 
-1. Record the content behind the component into a `GraphicsLayer` (the backdrop).
-2. Draw that layer through a rounded-rectangle clip.
-3. Apply blur (`RenderEffect` on API 31+).
-4. At the rounded edge, displace sampling along the signed-distance-field normal (refraction).
-5. Optionally sample seven nearby positions and split RGB channels (chromatic aberration).
-6. Add a translucent tint, vibrancy, edge highlight and shadow.
+1. 把组件背后的内容录进一个 `GraphicsLayer`（背景层）
+2. 用圆角矩形裁剪绘制该层
+3. 施加模糊（API 31+ 用 `RenderEffect`）
+4. 在圆角边缘沿 SDF 法线方向偏移采样（折射）
+5. 可选：采样邻近 7 个位置并拆开 RGB 通道（色散）
+6. 叠加半透明着色、色彩增益、边缘高光与阴影
 
-The emulator is API 28, so `RenderEffect` (API 31) and `RuntimeShader` (API 33) cannot run there. It will necessarily fall back to a translucent surface or a manually captured/blurred bitmap.
+模拟器是 API 28，`RenderEffect`（API 31）和 `RuntimeShader`（API 33）都跑不了，会退化成半透明色块或手工截图 + 模糊的位图。
 
-## Recommended reuse
+## 推荐复用方式
 
-For a new Jetpack Compose app on Android 13+ use the upstream library instead of copying APK internals:
+Android 13+ 的新项目直接用上游库，不要去抄 APK 内部实现：
 
 ```kotlin
 implementation("io.github.kyant0:backdrop-android:2.0.0")
 implementation("io.github.kyant0:shapes-android:1.2.0")
 ```
 
-Then combine `rememberLayerBackdrop`, `layerBackdrop` and `drawBackdrop` as shown in `compose_example.kt`.
+然后参考 `compose_example.kt` 组合 `rememberLayerBackdrop`、`layerBackdrop`、`drawBackdrop`。
 
-For Views, render the background into a bitmap (or use a blur library), then run the AGSL shader over that bitmap. A shader cannot blur or sample arbitrary views by itself; it needs a backdrop texture.
+传统 View 体系：先把背景渲染成 bitmap（或用模糊库），再让 AGSL 着色器处理这张 bitmap。着色器本身没法模糊或采样任意 View，必须给它一张背景纹理。
 
-## HTML interaction demo
+## HTML 交互 Demo
 
-Open `liquid-glass-demo.html` directly. It is intentionally a focused navigation-only test page: a colorful backdrop, one translucent glass track, four tabs, and one active liquid capsule. The capsule follows the pointer 1:1, switches tabs as it crosses them, and settles with an interruptible velocity-aware spring on release or click. Its material follows the `liquid-glass-main` / v0 approach: a hidden Canvas generates an SDF-shaped displacement map, that map is fed to an SVG `feDisplacementMap` through CSS `backdrop-filter`, and the surface adds a bright rim, inset thickness, and a pressed high-transparency state. The extracted APK shader notes remain in `refraction_dispersion.agsl` and `highlight.agsl`; the article at <https://juejin.cn/post/7514618352829448244> is a secondary reference for edge-only refraction.
+直接用浏览器打开 `liquid-glass-demo.html`。这是一个刻意收敛的导航测试页：彩色背景、一条半透明玻璃轨道、四个 tab、一个激活态的液态胶囊。
+
+胶囊 1:1 跟随指针，越过 tab 时切换选中，松手/点击后以可打断、带速度感知的弹簧收束。材质走 `liquid-glass-main` / v0 的思路：隐藏的 Canvas 生成 SDF 位移图，通过 CSS `backdrop-filter` 喂给 SVG `feDisplacementMap`，表面再叠加亮边、内嵌厚度和按下时的高透状态。
+
+APK 里提取的着色器笔记保留在 `refraction_dispersion.agsl` 和 `highlight.agsl`；边缘折射的另一种参考见 <https://juejin.cn/post/7514618352829448244>。
+
+## 目录内容
+
+| 文件 | 说明 |
+|---|---|
+| `liquid-glass-demo.html` | 可直接打开的交互 Demo |
+| `compose_example.kt` | Jetpack Compose 用法示例 |
+| `refraction_dispersion.agsl` | 折射 / 色散着色器笔记 |
+| `highlight.agsl` | 高光着色器笔记 |
+| `*.png` / `*.mp4` | 效果截图与录屏 |
